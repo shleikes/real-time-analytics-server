@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+#  postgres:
+#    image: postgres:latest
+#    hostname: postgres
+#    ports:
+#      - "5432:5432"
+#    environment:
+#      POSTGRES_DB: real-time-analytics
+#      POSTGRES_USER: myuser
+#      POSTGRES_PASSWORD: 1234567890
+
+  fake_data_generator:
+    build:
+      context: ./fake-data-injector
+    environment:
+      - KAFKA_BROKER=localhost:9092
+    network_mode: "host"
+
+  user_interactions_storer:
+    build:
+        context: ./user-interactions-storer
+    environment:
+      - KAFKA_BROKER=localhost:9092
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+    network_mode: "host"
+
+  analytics_engine:
+    build:
+      context: ./analytics-engine
+    environment:
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+    network_mode: "host"
